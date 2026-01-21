@@ -53,9 +53,15 @@ class UserController extends Controller
         foreach ($data as $index => $row) {
             $rowNumber = $index + 2; // +2 because we removed header and arrays are 0-indexed
 
-            // Map row data
+            // Map row data - ensure phone_number is treated as string with + prefix
+            // Excel/CSV readers may interpret +256... as a numeric value, losing the + sign
+            $phoneNumber = $row[0] ?? null;
+            if ($phoneNumber !== null && is_numeric($phoneNumber)) {
+                $phoneNumber = '+' . ltrim((string) $phoneNumber, '+');
+            }
+
             $userData = [
-                'phone_number' => $row[0] ?? null,
+                'phone_number' => $phoneNumber,
                 'name' => $row[1] ?? null,
             ];
 
