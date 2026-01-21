@@ -238,6 +238,4 @@ Make sure to set the `VITE_API_BASE_URL` environment variable to your production
 - Safari (latest)
 - Edge (latest)
 
-## License
 
-[Your License Here]
