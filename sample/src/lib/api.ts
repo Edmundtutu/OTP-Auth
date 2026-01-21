@@ -49,6 +49,20 @@ api.interceptors.request.use((config) => {
     return config;
 });
 
+// Response interceptor to handle 401 errors
+api.interceptors.response.use(
+    (response) => response,
+    (error: AxiosError) => {
+        if (error.response?.status === 401) {
+            setAuthToken(null);
+            if (typeof window !== "undefined" && window.location.pathname !== "/phone-input") {
+                window.location.href = "/phone-input";
+            }
+        }
+        return Promise.reject(error);
+    }
+);
+
 export const fetchCsrfCookie = () =>
     axios.get(`${API_BASE_URL}/sanctum/csrf-cookie`, {
         withCredentials: true,

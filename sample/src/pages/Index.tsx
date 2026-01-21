@@ -1,12 +1,26 @@
-import { Link } from "react-router-dom";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 
-const Index = () => (
-  <div className="min-h-screen flex items-center justify-center">
-    <div className="text-center space-y-4">
-      <h1 className="text-3xl font-bold">React + Vite</h1>
-      <Link to="/login" className="text-primary underline">Login</Link>
+const Index = () => {
+  const { isAuthenticated, isLoading } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!isLoading) {
+      if (isAuthenticated) {
+        navigate("/dashboard", { replace: true });
+      } else {
+        navigate("/phone-input", { replace: true });
+      }
+    }
+  }, [isAuthenticated, isLoading, navigate]);
+
+  return (
+    <div className="flex items-center justify-center min-h-screen">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
     </div>
-  </div>
-);
+  );
+};
 
 export default Index;
