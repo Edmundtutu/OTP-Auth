@@ -1,73 +1,243 @@
-# Welcome to your Lovable project
+# OTP Authentication Frontend
 
-## Project info
+A modern React frontend for the OTP (One-Time Password) authentication system. Built with React, TypeScript, Vite, and shadcn/ui components.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+## Features
 
-## How can I edit this code?
+- 📱 Phone number-based authentication
+- 🔐 OTP verification (6-digit code)
+- 🎨 Modern, responsive UI with Tailwind CSS
+- 🔒 Protected routes with authentication
+- 💾 Token-based session management
+- 🚀 Fast development with Vite
+- 📦 Type-safe with TypeScript
+- 🎯 Clean architecture with proper separation of concerns
 
-There are several ways of editing your application.
+## Tech Stack
 
-**Use Lovable**
+- **React 18** - UI library
+- **TypeScript** - Type safety
+- **Vite** - Build tool and dev server
+- **React Router v6** - Client-side routing
+- **TanStack Query** - Server state management
+- **Axios** - HTTP client
+- **shadcn/ui** - UI component library
+- **Tailwind CSS** - Utility-first CSS framework
+- **input-otp** - OTP input component
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+## Project Structure
 
-Changes made via Lovable will be committed automatically to this repo.
+```
+src/
+├── components/
+│   ├── ui/           # shadcn/ui components
+│   │   ├── button.tsx
+│   │   ├── card.tsx
+│   │   ├── input.tsx
+│   │   ├── label.tsx
+│   │   ├── input-otp.tsx
+│   │   ├── toast.tsx
+│   │   └── toaster.tsx
+│   └── ProtectedRoute.tsx
+├── contexts/
+│   └── AuthContext.tsx
+├── hooks/
+│   ├── useAuth.ts
+│   └── use-toast.ts
+├── lib/
+│   ├── api.ts
+│   ├── auth.service.ts
+│   └── utils.ts
+├── pages/
+│   ├── Index.tsx
+│   ├── PhoneInput.tsx
+│   ├── VerifyOtp.tsx
+│   └── Dashboard.tsx
+├── App.tsx
+└── main.tsx
+```
 
-**Use your preferred IDE**
+## Getting Started
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### Prerequisites
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+- Node.js 18+ and npm
+- Backend API running (default: http://localhost:8000)
 
-Follow these steps:
+### Installation
 
+1. Clone the repository:
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
 git clone <YOUR_GIT_URL>
+cd sample
+```
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+2. Install dependencies:
+```sh
+npm install
+```
 
-# Step 3: Install the necessary dependencies.
-npm i
+3. Configure environment variables:
+```sh
+cp .env.example .env
+```
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+Edit `.env` and set your API URL:
+```
+VITE_API_BASE_URL=http://localhost:8000
+```
+
+4. Start the development server:
+```sh
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+The app will be available at `http://localhost:5173`
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## Available Scripts
 
-**Use GitHub Codespaces**
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run build:dev` - Build in development mode
+- `npm run preview` - Preview production build
+- `npm run lint` - Run ESLint
+- `npm run test` - Run tests
+- `npm run test:watch` - Run tests in watch mode
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## API Integration
 
-## What technologies are used for this project?
+The frontend connects to the Laravel backend API with the following endpoints:
 
-This project is built with:
+### Authentication Flow
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+1. **Request OTP**
+   - Endpoint: `POST /api/auth/request-otp`
+   - Body: `{ phone_number: string }`
+   - Response: `{ message: string }`
 
-## How can I deploy this project?
+2. **Verify OTP**
+   - Endpoint: `POST /api/auth/verify-otp`
+   - Body: `{ phone_number: string, otp: string }`
+   - Response: `{ token: string, user: User }`
 
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
+3. **Get User Info**
+   - Endpoint: `GET /api/me`
+   - Headers: `Authorization: Bearer {token}`
+   - Response: `User`
 
-## Can I connect a custom domain to my Lovable project?
+4. **Logout**
+   - Endpoint: `POST /api/auth/logout`
+   - Headers: `Authorization: Bearer {token}`
 
-Yes, you can!
+## Architecture
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+### Authentication Context
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+The `AuthContext` manages the authentication state globally:
+- User information
+- Authentication token
+- Login/logout methods
+- Token persistence in localStorage
+
+### Protected Routes
+
+Routes requiring authentication are wrapped with `ProtectedRoute`:
+- Checks authentication status
+- Redirects to login if not authenticated
+- Shows loading state during verification
+
+### API Service Layer
+
+- **api.ts**: Axios configuration with interceptors
+  - Attaches Bearer token to requests
+  - Handles 401 errors (auto-logout)
+  
+- **auth.service.ts**: Authentication API methods
+  - Request OTP
+  - Verify OTP
+  - Get user profile
+  - Logout
+  - Token management
+
+## User Flow
+
+1. **Landing** (`/`)
+   - Redirects to `/phone-input` if not authenticated
+   - Redirects to `/dashboard` if authenticated
+
+2. **Phone Input** (`/phone-input`)
+   - Enter phone number (must start with +)
+   - Request OTP
+   - Navigate to verification page
+
+3. **OTP Verification** (`/verify-otp`)
+   - Enter 6-digit OTP code
+   - Verify OTP
+   - Option to resend code
+   - Option to change phone number
+   - On success, navigate to dashboard
+
+4. **Dashboard** (`/dashboard`) - Protected
+   - Display user information
+   - Logout functionality
+
+## Environment Variables
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `VITE_API_BASE_URL` | Backend API URL | `http://localhost:8000` |
+
+## Building for Production
+
+```sh
+npm run build
+```
+
+This creates an optimized production build in the `dist/` directory.
+
+To preview the production build:
+```sh
+npm run preview
+```
+
+## Deployment
+
+The built static files can be deployed to any static hosting service:
+- Vercel
+- Netlify
+- AWS S3 + CloudFront
+- GitHub Pages
+- Any web server
+
+Make sure to set the `VITE_API_BASE_URL` environment variable to your production API URL.
+
+## Development Guidelines
+
+### Adding New Pages
+
+1. Create page component in `src/pages/`
+2. Add route in `src/App.tsx`
+3. Wrap with `ProtectedRoute` if authentication required
+
+### Adding New API Endpoints
+
+1. Add method to `src/lib/auth.service.ts` or create new service
+2. Use the configured `api` instance from `src/lib/api.ts`
+3. Handle errors appropriately with toast notifications
+
+### UI Components
+
+- Use shadcn/ui components from `src/components/ui/`
+- Follow Tailwind CSS conventions
+- Maintain responsive design
+
+## Browser Support
+
+- Chrome (latest)
+- Firefox (latest)
+- Safari (latest)
+- Edge (latest)
+
+## License
+
+[Your License Here]
