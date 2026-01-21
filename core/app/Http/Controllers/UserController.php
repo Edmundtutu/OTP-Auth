@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\BulkImportRequest;
 use App\Http\Requests\CreateUserRequest;
 use App\Models\User;
+use App\Rules\UserValidationRules;
 use Illuminate\Http\JsonResponse;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Validator;
@@ -58,16 +59,8 @@ class UserController extends Controller
                 'name' => $row[1] ?? null,
             ];
 
-            // Validate row
-            $validator = Validator::make($userData, [
-                'phone_number' => [
-                    'required',
-                    'string',
-                    'unique:users,phone_number',
-                    'regex:/^\+[1-9]\d{1,14}$/',
-                ],
-                'name' => ['nullable', 'string', 'max:255'],
-            ]);
+            // Validate row using shared validation rules
+            $validator = Validator::make($userData, UserValidationRules::rules(), UserValidationRules::messages());
 
             if ($validator->fails()) {
                 $failed++;

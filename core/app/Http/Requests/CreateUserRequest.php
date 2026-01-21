@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Rules\UserValidationRules;
 use Illuminate\Foundation\Http\FormRequest;
 
 class CreateUserRequest extends FormRequest
@@ -19,15 +20,7 @@ class CreateUserRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
-            'phone_number' => [
-                'required',
-                'string',
-                'unique:users,phone_number',
-                'regex:/^\+[1-9]\d{1,14}$/',
-            ],
-            'name' => ['nullable', 'string', 'max:255'],
-        ];
+        return UserValidationRules::rules();
     }
 
     /**
@@ -35,8 +28,6 @@ class CreateUserRequest extends FormRequest
      */
     public function messages(): array
     {
-        return [
-            'phone_number.regex' => 'The phone number must be in international format (e.g., +256XXXXXXXXX).',
-        ];
+        return UserValidationRules::messages();
     }
 }

@@ -11,7 +11,8 @@ Route::post('/auth/request-otp', [OtpAuthController::class, 'requestOtp'])
     ->middleware('throttle:otp-requests');
 Route::post('/auth/verify-otp', [OtpAuthController::class, 'verifyOtp']);
 
-// Admin routes (unprotected for Postman testing)
+// Admin routes (intentionally unprotected for Postman testing as per requirements)
+// NOTE: In production, these should be protected with proper authentication
 Route::post('/users', [UserController::class, 'store']);
 Route::post('/users/bulk', [UserController::class, 'bulkImport']);
 
