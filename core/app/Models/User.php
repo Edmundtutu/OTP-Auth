@@ -18,7 +18,9 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
+        'phone_number',
         'name',
+        'status',
         'email',
         'password',
     ];
@@ -44,5 +46,13 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    /**
+     * Get the OTPs for the user.
+     */
+    public function otps()
+    {
+        return $this->hasMany(Otp::class);
     }
 }
